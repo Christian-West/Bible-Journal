@@ -1,0 +1,64 @@
+CSV [DATA]dataNotebooks Formats:
+	Notebooks: {NotebookType,;Name,Owner,}  
+		Ex: l,;Notebook1.txt,username1,
+			l,;Notebook1.txt,umm,
+			j,;Notebook2.txt,flowers1334A,
+
+	Users: {;Username,;Password,}
+		Ex: ;username1,;password1,
+			;flowers1334A,;flowersbreadcup,
+			;umm,;rainbowFish155,
+
+	HasAccess: {;NotebookName,Owner,usernameAllowedAccess1,usernameAllowedAcces2,...;,}
+		Ex: ;Notebook1.txt,username1,username2,;,
+			;Notebook1.txt,umm,flowers1334A,;,
+
+	Updates: {dataNotebook,item,updateType;change,}
+		Ex: Notebooks,Notebook1.txt,CHANGE_NAME;Notebook2.txt,
+			Notebooks,Notebook1.txt,CHANGE_NAME;TestNotebook.txt,
+
+Various Requirements/Restrictions
+	Anything
+		- cannot have ","
+		- cannot have ";"
+		- cannot have a "." (except for notebook name endings ".txt")
+	Notebooks
+		- must end with ".txt"
+		- names must be non-empty
+		- names must be unique
+			- can probably add "([next value])" to end of name (before ".txt")
+				Ex: Notebook1(1).txt
+	Users
+		- usernames must be unique
+		- usernames must be non-empty
+		- passwords must be non-empty
+		- cannot contain "NULL"
+	Admin
+		- username = admin<<>>
+	[DATA]Updates.csv
+		- items
+			- Notebooknames
+			- Usernames
+			- Passwords
+		- updateTypes
+			- types
+				- ADD_NOTEBOOK: new notebook added to [DATA]Notebooks.csv
+				- ADD_USER: new user added to [DATA]Users.csv
+				- CHANGE_NAME: name (notebook or user) changed
+				- CHANGE_PASS: password changed
+				- ADD_HAS_ACCESS_NOTEBOOK: new notebook added to [DATA]HasAccess.csv
+				- ALLOW_ACCESS: username added to list of users allows access to a notebook (located in [DATA]HasAccess.csv)
+				- REMOVE: username removed from list of users allows access to a notebook (located in [DATA]HasAccess.csv)
+				- DELETE: item removed from system
+			- additional rules
+				ADD_NOTEBOOK
+					- owner of added notebook can be "NULL"; there is no owner yet
+				CHANGE_NAME
+					- must also update name (notebook or user) in [DATA]HasAccess.csv
+				ADD_HAS_ACCESS_NOTEBOOK
+					- must also include ALLOW_ACCESS; cannot be just the notebook and owner name
+				DELETE
+					- for username
+						- must make username of ALL notebooks owned "NULL" in [DATA]Notebooks.csv
+						- must also delete from [DATA]HasAccess.csv
+					- for notebook, must also delete entire line from [DATA]HasAccess.csv
